@@ -11,6 +11,7 @@ db.init_app(app)
 def add_cors_header(response):
     response.headers["Access-Control-Allow-Origin"] = "http://localhost:5173"
     response.headers["Access-Control-Allow-Headers"] = "*"
+    response.headers["Access-Control-Allow-Methods"] = "*"
     return response
 
 
@@ -55,13 +56,21 @@ def disc_add():
     db.session.commit()
     return new_disc.to_dict()
 
-@app.route("/disc/<int:id>/delete", methods=["GET", "POST"])
+@app.route("/discs/<int:id>", methods=["DELETE"])
 def disc_delete(id):
     disc = db.get_or_404(Disc, id)
+    db.session.delete(disc)
+    db.session.commit()
+    return ({}, 204)
 
-    if request.method == "POST":
-        db.session.delete(disc)
-        db.session.commit()
-        return redirect(url_for("disc_list"))
-    
-    return render_template("disc/delete.html", disc=disc)
+@app.route("/discs/<int:id>", methods=["PUT"])
+def disc_update(id):
+    updated_disc = request.json
+    # TODO inBag case should be snake_case
+    disc = db.get_or_404(Disc, id)
+    for key in updated_disc:
+        setattr(disc, key, updated_disc[key])
+
+    db.session.add(disc)
+    db.session.commit()
+    return disc.to_dict()
