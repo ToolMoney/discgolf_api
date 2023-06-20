@@ -1,23 +1,6 @@
-from flask import Flask, request, render_template, redirect, url_for
-from flask_sqlalchemy import SQLAlchemy
+from . import app, db
+from flask import request
 
-
-db = SQLAlchemy()
-app = Flask(__name__)
-app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///project.db"
-db.init_app(app)
-
-@app.after_request
-def add_cors_header(response):
-    response.headers["Access-Control-Allow-Origin"] = "http://localhost:5173"
-    response.headers["Access-Control-Allow-Headers"] = "*"
-    response.headers["Access-Control-Allow-Methods"] = "*"
-    return response
-
-
-@app.route("/")
-def hello_world():
-    return "Hello world."
 
 class Disc(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -43,11 +26,11 @@ class Disc(db.Model):
 with app.app_context():
     db.create_all()
 
+
 @app.route("/discs", methods=["GET"])
 def disc_list():
     discs = db.session.execute(db.select(Disc).order_by(Disc.speed)).scalars()
     return [disc.to_dict() for disc in discs]
-
 
 @app.route("/discs", methods=["POST"])
 def disc_add():
