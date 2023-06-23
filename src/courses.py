@@ -5,21 +5,23 @@ from flask import request
 class Course(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String, nullable=False)
-    holes = db.Column(db.Integer)
     location = db.Column(db.String)
     fee = db.Column(db.Integer)
     favorite = db.Column(db.Boolean)
+
+    holes = db.relationship("Hole", back_populates="course", order_by="(Hole.hole_number.asc(), nulls_last(Hole.layout.asc()))")
 
     def to_dict(self):
         return {
             "id": self.id,
             "name": self.name,
-            "holes": self.holes,
             "location": self.location,
             "fee": self.fee,
             "favorite": self.favorite,
+            "holes": [hole.to_dict() for hole in self.holes]
             }
-    
+
+
 
 with app.app_context():
     db.create_all()
@@ -28,7 +30,7 @@ with app.app_context():
 @app.route("/courses", methods=["GET"])
 def course_list():
     courses = db.session.execute(db.select(Course).order_by(Course.favorite.desc())).scalars()
-    return [disc.to_dict() for disc in courses]
+    return [course.to_dict() for course in courses]
 
 @app.route("/courses", methods=["POST"])
 def course_add():
@@ -53,4 +55,10 @@ def course_update(id):
 
     db.session.add(course)
     db.session.commit()
+    return course.to_dict()
+
+
+@app.route("/courses/<int:id>", methods=["GET"])
+def course_details(id):
+    course = db.session.execute(db.select(Course).where(Course.id == id)).scalar()
     return course.to_dict()

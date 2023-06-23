@@ -17,3 +17,4 @@ def add_cors_header(response):
 
 from . import discs
 from . import courses
+from . import holes
