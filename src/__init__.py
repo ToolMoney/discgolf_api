@@ -15,6 +15,4 @@ def add_cors_header(response):
     return response
 
 
-from . import discs
-from . import courses
-from . import holes
+from . import discs, courses, holes, rounds, scores

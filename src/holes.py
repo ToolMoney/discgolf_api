@@ -11,6 +11,7 @@ class Hole(db.Model):
     course_id = db.Column(db.Integer, db.ForeignKey('course.id'))
 
     course = db.relationship("Course", back_populates="holes")
+    scores = db.relationship("Score", back_populates="hole", order_by="(Score.score.desc())")
 
     def to_dict(self):
         return {
@@ -44,7 +45,7 @@ def hole_delete(course_id, id):
 
 @app.route("/courses/<int:course_id>/<int:id>", methods=["PUT"])
 def hole_update(course_id, id):
-    updated_hole = request.json
+    updated_hole = request.json    
     hole = db.get_or_404(Hole, id)
     for key in updated_hole:
         setattr(hole, key, updated_hole[key])

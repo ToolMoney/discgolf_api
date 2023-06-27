@@ -10,6 +10,7 @@ class Course(db.Model):
     favorite = db.Column(db.Boolean)
 
     holes = db.relationship("Hole", back_populates="course", order_by="(Hole.hole_number.asc(), nulls_last(Hole.layout.asc()))")
+    rounds = db.relationship("Round", back_populates="course", order_by="(Round.date.desc())")
 
     def to_dict(self):
         return {
@@ -18,7 +19,8 @@ class Course(db.Model):
             "location": self.location,
             "fee": self.fee,
             "favorite": self.favorite,
-            "holes": [hole.to_dict() for hole in self.holes]
+            "holes": [hole.to_dict() for hole in self.holes],
+            "rounds": [round.to_dict() for round in self.rounds],
             }
 
 
