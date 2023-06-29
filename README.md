@@ -17,5 +17,5 @@ $ . venv/bin/activate
 ## running server
 
 ```bash
-$ flask --app discgolf.py run --debug
+$ flask --app src run --debug
 ```
