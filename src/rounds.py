@@ -1,5 +1,7 @@
 from . import app, db
 from flask import request
+from marshmallow import Schema, fields, EXCLUDE
+from .scores import ScoreSchema
 
 
 class Round(db.Model):
@@ -11,18 +13,18 @@ class Round(db.Model):
 
     scores = db.relationship("Score", back_populates="round")
     course = db.relationship("Course", back_populates="rounds")
-
-
-    def to_dict(self):
-        return {
-            "id": self.id,
-            "date": self.date,
-            # "user": self.user,
-            "default_layout": self.default_layout,
-            "course_id": self.course_id,
-            "scores": [score.to_dict() for score in self.scores],
-            }
     
+
+class RoundSchema(Schema):
+    class Meta:
+        unknown = EXCLUDE
+
+    id = fields.Int(dump_only=True)
+    date = fields.Str()
+    default_layout = fields.Str()
+    course_id = fields.Int(required=True)
+    scores = fields.List(fields.Nested(ScoreSchema))
+
 
 with app.app_context():
     db.create_all()
@@ -31,15 +33,16 @@ with app.app_context():
 @app.route("/rounds", methods=["GET"])
 def round_list():
     rounds = db.session.execute(db.select(Round).order_by(Round.date.desc())).scalars()
-    return [round.to_dict() for round in rounds]
+    return RoundSchema(many=True).dump(rounds)
 
 @app.route("/rounds", methods=["POST"])
 def round_add():
-    # new_hole = Hole(course_id=course_id, **request.json)
-    new_round = Round(**request.json)
+    schema = RoundSchema()
+    request_data = schema.load(request.json)
+    new_round = Round(**request_data)
     db.session.add(new_round)
     db.session.commit()
-    return new_round.to_dict()
+    return schema.dump(new_round)
 
 @app.route("/rounds/<int:id>", methods=["DELETE"])
 def round_delete(id):
@@ -50,17 +53,18 @@ def round_delete(id):
 
 @app.route("/rounds/<int:id>", methods=["PUT"])
 def round_update(id):
-    updated_round = request.json
+    schema = RoundSchema()
+    updated_round = schema.load(request.json)
     round = db.get_or_404(Round, id)
     for key in updated_round:
         setattr(round, key, updated_round[key])
 
     db.session.add(round)
     db.session.commit()
-    return round.to_dict()
+    return schema.dump(round)
 
 
 @app.route("/rounds/<int:id>", methods=["GET"])
 def round_details(id):
     round = db.session.execute(db.select(Round).where(Round.id == id)).scalar()
-    return round.to_dict()
+    return RoundSchema().dump(round)

@@ -1,5 +1,6 @@
 from . import app, db
 from flask import request
+from marshmallow import Schema, fields, EXCLUDE
 
 
 class Score(db.Model):
@@ -11,14 +12,15 @@ class Score(db.Model):
     round = db.relationship("Round", back_populates="scores")
     hole = db.relationship("Hole", back_populates="scores")
 
-    def to_dict(self):
-        return {
-            "id": self.id,
-            "round_id": self.round_id,
-            "hole_id": self.hole_id,
-            "score": self.score,
-        }
 
+class ScoreSchema(Schema):
+    class Meta:
+        unknown = EXCLUDE
+        
+    id = fields.Int(dump_only=True)
+    round_id = fields.Int(dump_only=True, required=True)
+    hole_id = fields.Int(required=True)
+    score = fields.Int(required=True)
 
 
 with app.app_context():
@@ -27,10 +29,12 @@ with app.app_context():
 
 @app.route("/rounds/<int:round_id>/scores", methods=["POST"])
 def score_add(round_id):
-    new_score = Score(**({"round_id": round_id} | request.json))
+    schema = ScoreSchema()
+    request_data = schema.load(request.json)
+    new_score = Score(**({"round_id": round_id} | request_data))
     db.session.add(new_score)
     db.session.commit()
-    return new_score.to_dict()
+    return schema.dump(new_score)
 
 @app.route("/rounds/<int:round_id>/scores/<int:id>", methods=["DELETE"])
 def score_delete(round_id, id):
@@ -41,11 +45,12 @@ def score_delete(round_id, id):
 
 @app.route("/rounds/<int:round_id>/scores/<int:id>", methods=["PUT"])
 def score_update(round_id, id):
-    updated_score = request.json
+    schema = ScoreSchema()
+    updated_score = schema.load(request.json)
     score = db.get_or_404(Score, id)
     for key in updated_score:
         setattr(score, key, updated_score[key])
 
     db.session.add(score)
     db.session.commit()
-    return score.to_dict()
+    return schema.dump(score)

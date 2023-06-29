@@ -1,5 +1,6 @@
 from . import app, db
 from flask import request
+from marshmallow import Schema, fields, EXCLUDE
 
 
 class Hole(db.Model):
@@ -13,16 +14,17 @@ class Hole(db.Model):
     course = db.relationship("Course", back_populates="holes")
     scores = db.relationship("Score", back_populates="hole", order_by="(Score.score.desc())")
 
-    def to_dict(self):
-        return {
-            "id": self.id,
-            "hole_number": self.hole_number,
-            "par": self.par,
-            "layout": self.layout,
-            "distance": self.distance,
-            "course_id": self.course_id,
-        }
 
+class HoleSchema(Schema):
+    class Meta:
+        unknown = EXCLUDE
+    
+    id = fields.Int(dump_only=True)
+    hole_number = fields.Int(allow_none=True)
+    par = fields.Int(allow_none=True)
+    layout = fields.Str(allow_none=True)
+    distance = fields.Int(allow_none=True)
+    course_id = fields.Int(required=True)
 
 
 with app.app_context():
@@ -31,10 +33,12 @@ with app.app_context():
 
 @app.route("/courses/<int:course_id>", methods=["POST"])
 def hole_add(course_id):
-    new_hole = Hole(course_id=course_id, **request.json)
+    schema = HoleSchema()
+    request_data = schema.load(request.json)
+    new_hole = Hole(course_id=course_id, **request_data)
     db.session.add(new_hole)
     db.session.commit()
-    return new_hole.to_dict()
+    return schema.dump(new_hole)
 
 @app.route("/courses/<int:course_id>/<int:id>", methods=["DELETE"])
 def hole_delete(course_id, id):
@@ -45,11 +49,12 @@ def hole_delete(course_id, id):
 
 @app.route("/courses/<int:course_id>/<int:id>", methods=["PUT"])
 def hole_update(course_id, id):
-    updated_hole = request.json    
+    schema = HoleSchema()
+    updated_hole = schema.load(request.json)
     hole = db.get_or_404(Hole, id)
     for key in updated_hole:
         setattr(hole, key, updated_hole[key])
 
     db.session.add(hole)
     db.session.commit()
-    return hole.to_dict()
+    return schema.dump(hole)
