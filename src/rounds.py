@@ -26,10 +26,6 @@ class RoundSchema(Schema):
     scores = fields.List(fields.Nested(ScoreSchema))
 
 
-with app.app_context():
-    db.create_all()
-
-
 @app.route("/rounds", methods=["GET"])
 def round_list():
     rounds = db.session.execute(db.select(Round).order_by(Round.date.desc())).scalars()

@@ -24,12 +24,7 @@ class DiscSchema(Schema):
     turn = fields.Int(allow_none=True)
     fade = fields.Int(allow_none=True)
     inBag = fields.Bool()
-
     
-
-with app.app_context():
-    db.create_all()
-
 
 @app.route("/discs", methods=["GET"])
 def disc_list():

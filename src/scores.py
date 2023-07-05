@@ -23,10 +23,6 @@ class ScoreSchema(Schema):
     score = fields.Int(required=True)
 
 
-with app.app_context():
-    db.create_all()
-
-
 @app.route("/rounds/<int:round_id>/scores", methods=["POST"])
 def score_add(round_id):
     schema = ScoreSchema()

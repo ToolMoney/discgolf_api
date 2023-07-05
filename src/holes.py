@@ -27,15 +27,11 @@ class HoleSchema(Schema):
     course_id = fields.Int(required=True)
 
 
-with app.app_context():
-    db.create_all()
-
-
 @app.route("/courses/<int:course_id>", methods=["POST"])
 def hole_add(course_id):
     schema = HoleSchema()
-    request_data = schema.load(request.json)
-    new_hole = Hole(course_id=course_id, **request_data)
+    request_data = schema.load({"course_id": course_id, **request.json})
+    new_hole = Hole(**request_data)
     db.session.add(new_hole)
     db.session.commit()
     return schema.dump(new_hole)

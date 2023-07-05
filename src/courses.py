@@ -29,10 +29,6 @@ class CourseSchema(Schema):
     rounds = fields.List(fields.Nested(RoundSchema))
 
 
-with app.app_context():
-    db.create_all()
-
-
 @app.route("/courses", methods=["GET"])
 def course_list():
     courses = db.session.execute(db.select(Course).order_by(Course.favorite.desc())).scalars()
