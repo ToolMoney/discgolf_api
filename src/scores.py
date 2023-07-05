@@ -5,9 +5,9 @@ from marshmallow import Schema, fields, EXCLUDE
 
 class Score(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    round_id = db.Column(db.Integer, db.ForeignKey('round.id'))
-    hole_id = db.Column(db.Integer, db.ForeignKey('hole.id'))
-    score = db.Column(db.Integer)
+    round_id = db.Column(db.Integer, db.ForeignKey('round.id'), nullable=False)
+    hole_id = db.Column(db.Integer, db.ForeignKey('hole.id'), nullable=False)
+    score = db.Column(db.Integer, nullable=False)
     
     round = db.relationship("Round", back_populates="scores")
     hole = db.relationship("Hole", back_populates="scores")

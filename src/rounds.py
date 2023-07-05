@@ -9,9 +9,9 @@ class Round(db.Model):
     date = db.Column(db.String)
     # user = db.Column()
     default_layout = db.Column(db.String)
-    course_id = db.Column(db.Integer, db.ForeignKey('course.id'))
+    course_id = db.Column(db.Integer, db.ForeignKey('course.id'), nullable=False)
 
-    scores = db.relationship("Score", back_populates="round")
+    scores = db.relationship("Score", back_populates="round", cascade="all, delete-orphan")
     course = db.relationship("Course", back_populates="rounds")
     
 

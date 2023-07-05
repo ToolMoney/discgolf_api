@@ -9,10 +9,10 @@ class Hole(db.Model):
     par = db.Column(db.Integer)
     layout = db.Column(db.String)
     distance = db.Column(db.Integer)
-    course_id = db.Column(db.Integer, db.ForeignKey('course.id'))
+    course_id = db.Column(db.Integer, db.ForeignKey('course.id'), nullable=False)
 
     course = db.relationship("Course", back_populates="holes")
-    scores = db.relationship("Score", back_populates="hole", order_by="(Score.score.desc())")
+    scores = db.relationship("Score", back_populates="hole", order_by="(Score.score.desc())", cascade="all, delete-orphan")
 
 
 class HoleSchema(Schema):

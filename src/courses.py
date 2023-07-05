@@ -12,8 +12,8 @@ class Course(db.Model):
     fee = db.Column(db.Integer)
     favorite = db.Column(db.Boolean)
 
-    holes = db.relationship("Hole", back_populates="course", order_by="(Hole.hole_number.asc(), nulls_last(Hole.layout.asc()))")
-    rounds = db.relationship("Round", back_populates="course", order_by="(Round.date.desc())")
+    holes = db.relationship("Hole", back_populates="course", order_by="(Hole.hole_number.asc(), nulls_last(Hole.layout.asc()))", cascade="all, delete-orphan")
+    rounds = db.relationship("Round", back_populates="course", order_by="(Round.date.desc())", cascade="all, delete-orphan")
 
 
 class CourseSchema(Schema):
