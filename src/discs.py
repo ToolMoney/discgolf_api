@@ -10,7 +10,7 @@ class Disc(db.Model):
     glide = db.Column(db.Integer)
     turn = db.Column(db.Integer)
     fade = db.Column(db.Integer)
-    inBag = db.Column(db.Boolean)
+    in_bag = db.Column(db.Boolean)
 
 
 class DiscSchema(Schema):
@@ -23,7 +23,7 @@ class DiscSchema(Schema):
     glide = fields.Int(allow_none=True)
     turn = fields.Int(allow_none=True)
     fade = fields.Int(allow_none=True)
-    inBag = fields.Bool()
+    in_bag = fields.Bool(data_key="inBag")
     
 
 @app.route("/discs", methods=["GET"])
@@ -52,7 +52,6 @@ def disc_delete(id):
 def disc_update(id):
     schema = DiscSchema()
     updated_disc = schema.load(request.json)
-    # TODO inBag case should be snake_case
     disc = db.get_or_404(Disc, id)
     for key in updated_disc:
         setattr(disc, key, updated_disc[key])
