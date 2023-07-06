@@ -1,18 +1,30 @@
 from flask import Flask, json
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.exceptions import HTTPException
-
+from flask_login import LoginManager
+from flask_bcrypt import Bcrypt
+import traceback
 
 db = SQLAlchemy()
 app = Flask(__name__)
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///project.db"
 db.init_app(app)
 
+login_manager = LoginManager()
+login_manager.init_app(app)
+app.secret_key = b'SecretKey-please move'
+app.config["SESSION_COOKIE_SAMESITE"] = "None"
+app.config["SESSION_COOKIE_SECURE"] = True
+bcrypt = Bcrypt(app)
+
+
+
 @app.after_request
 def add_cors_headers(response):
     response.headers["Access-Control-Allow-Origin"] = "http://localhost:5173"
-    response.headers["Access-Control-Allow-Headers"] = "*"
+    response.headers["Access-Control-Allow-Headers"] = "content-type"
     response.headers["Access-Control-Allow-Methods"] = "*"
+    response.headers["Access-Control-Allow-Credentials"] = "true"
     return response
 
 
@@ -32,6 +44,8 @@ def handle_exception(exception):
     if isinstance(exception, HTTPException):
         return exception
     
+    app.logger.error('An error occurred: %s', exception)
+    print(traceback.format_exc())
     return json.dumps({
         "code": 500,
         "name": str(type(exception)),
@@ -39,4 +53,4 @@ def handle_exception(exception):
     }), 500
 
 
-from . import discs, courses, holes, rounds, scores
+from . import discs, courses, holes, rounds, scores, users

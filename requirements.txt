@@ -3,3 +3,5 @@ sqlalchemy
 flask-sqlalchemy
 marshmallow
 alembic
+flask-login
+flask-bcrypt
