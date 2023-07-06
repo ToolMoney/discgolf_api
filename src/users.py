@@ -1,7 +1,7 @@
-from . import app, db, bcrypt
+from . import app, db, bcrypt, login_manager
 from flask import request
 from marshmallow import Schema, fields, EXCLUDE
-from flask_login import UserMixin, login_user
+from flask_login import UserMixin, login_user, current_user
 
 
 class User(db.Model, UserMixin):
@@ -47,3 +47,14 @@ def login():
         login_user(user)
         return schema.dump(user)
     raise Exception('your password does not match a user by that name')
+
+@app.route("/users/self", methods=["GET"])
+def user_get():
+    schema = UserSchema()
+    print(current_user)
+    return schema.dump(current_user)
+
+@login_manager.user_loader
+def load_user(user_id):
+    user = db.session.execute(db.select(User).where(User.id == user_id)).scalar()
+    return user
