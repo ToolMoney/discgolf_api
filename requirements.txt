@@ -5,3 +5,5 @@ marshmallow
 alembic
 flask-login
 flask-bcrypt
+flake8
+gunicorn

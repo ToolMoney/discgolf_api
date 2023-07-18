@@ -2,43 +2,51 @@ from . import app, db
 from flask import request
 from marshmallow import Schema, fields, EXCLUDE
 from .scores import ScoreSchema
+from flask_login import current_user
 
 
 class Round(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    date = db.Column(db.String)
-    # user = db.Column()
-    default_layout = db.Column(db.String)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     course_id = db.Column(db.Integer, db.ForeignKey('course.id'), nullable=False)
+    date = db.Column(db.String)
+    default_layout = db.Column(db.String)
 
-    scores = db.relationship("Score", back_populates="round", cascade="all, delete-orphan")
+    user = db.relationship("User")
     course = db.relationship("Course", back_populates="rounds")
-    
+    scores = db.relationship("Score", back_populates="round", cascade="all, delete-orphan")
+
 
 class RoundSchema(Schema):
     class Meta:
         unknown = EXCLUDE
 
     id = fields.Int(dump_only=True)
+    course_id = fields.Int(required=True)
     date = fields.Str()
     default_layout = fields.Str()
-    course_id = fields.Int(required=True)
     scores = fields.List(fields.Nested(ScoreSchema))
 
 
 @app.route("/rounds", methods=["GET"])
 def round_list():
-    rounds = db.session.execute(db.select(Round).order_by(Round.date.desc())).scalars()
+    rounds = db.session.execute(
+        db.select(Round)
+        .where(Round.user_id == current_user.id)
+        .order_by(Round.date.desc())
+    ).scalars()
     return RoundSchema(many=True).dump(rounds)
+
 
 @app.route("/rounds", methods=["POST"])
 def round_add():
     schema = RoundSchema()
     request_data = schema.load(request.json)
-    new_round = Round(**request_data)
+    new_round = Round(user_id=current_user.id, **request_data)
     db.session.add(new_round)
     db.session.commit()
     return schema.dump(new_round)
+
 
 @app.route("/rounds/<int:id>", methods=["DELETE"])
 def round_delete(id):
@@ -46,6 +54,7 @@ def round_delete(id):
     db.session.delete(round)
     db.session.commit()
     return ({}, 204)
+
 
 @app.route("/rounds/<int:id>", methods=["PUT"])
 def round_update(id):

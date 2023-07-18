@@ -1,14 +1,17 @@
 from . import app, db
 from flask import request
 from marshmallow import Schema, fields, EXCLUDE
+from flask_login import current_user
 
 
 class Score(db.Model):
     id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     round_id = db.Column(db.Integer, db.ForeignKey('round.id'), nullable=False)
     hole_id = db.Column(db.Integer, db.ForeignKey('hole.id'), nullable=False)
     score = db.Column(db.Integer, nullable=False)
-    
+
+    user = db.relationship("User")
     round = db.relationship("Round", back_populates="scores")
     hole = db.relationship("Hole", back_populates="scores")
 
@@ -16,7 +19,7 @@ class Score(db.Model):
 class ScoreSchema(Schema):
     class Meta:
         unknown = EXCLUDE
-        
+
     id = fields.Int(dump_only=True)
     round_id = fields.Int(dump_only=True, required=True)
     hole_id = fields.Int(required=True)
@@ -27,10 +30,11 @@ class ScoreSchema(Schema):
 def score_add(round_id):
     schema = ScoreSchema()
     request_data = schema.load(request.json)
-    new_score = Score(**({"round_id": round_id} | request_data))
+    new_score = Score(user_id=current_user.id, **({"round_id": round_id} | request_data))
     db.session.add(new_score)
     db.session.commit()
     return schema.dump(new_score)
+
 
 @app.route("/rounds/<int:round_id>/scores/<int:id>", methods=["DELETE"])
 def score_delete(round_id, id):
@@ -38,6 +42,7 @@ def score_delete(round_id, id):
     db.session.delete(score)
     db.session.commit()
     return ({}, 204)
+
 
 @app.route("/rounds/<int:round_id>/scores/<int:id>", methods=["PUT"])
 def score_update(round_id, id):

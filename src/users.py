@@ -10,16 +10,26 @@ class User(db.Model, UserMixin):
     pass_hash = db.Column(db.String, nullable=False)
     email = db.Column(db.String, nullable=False)
 
+    courses = db.relationship(
+        "Course",
+        back_populates="user",
+        cascade="all, delete-orphan"
+    )
+    discs = db.relationship(
+        "Disc",
+        back_populates="user",
+        cascade="all, delete-orphan"
+    )
+
 
 class UserSchema(Schema):
     class Meta:
         unknown = EXCLUDE
-    
+
     id = fields.Int(dump_only=True)
     name = fields.Str(required=True)
     password = fields.Str(load_only=True)
     email = fields.Str()
-
 
 
 @app.route("/users", methods=["POST"])
@@ -37,6 +47,7 @@ def user_add():
     login_user(new_user)
     return schema.dump(new_user)
 
+
 @app.route("/users/login", methods=["POST"])
 def login():
     schema = UserSchema()
@@ -48,11 +59,13 @@ def login():
         return schema.dump(user)
     raise Exception('your password does not match a user by that name')
 
+
 @app.route("/users/self", methods=["GET"])
 def user_get():
     schema = UserSchema()
     print(current_user)
     return schema.dump(current_user)
+
 
 @login_manager.user_loader
 def load_user(user_id):

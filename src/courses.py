@@ -3,17 +3,30 @@ from flask import request
 from marshmallow import Schema, fields, EXCLUDE
 from .holes import HoleSchema
 from .rounds import RoundSchema
+from flask_login import current_user
 
 
 class Course(db.Model):
     id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     name = db.Column(db.String, nullable=False)
     location = db.Column(db.String)
     fee = db.Column(db.Integer)
     favorite = db.Column(db.Boolean)
 
-    holes = db.relationship("Hole", back_populates="course", order_by="(Hole.hole_number.asc(), nulls_last(Hole.layout.asc()))", cascade="all, delete-orphan")
-    rounds = db.relationship("Round", back_populates="course", order_by="(Round.date.desc())", cascade="all, delete-orphan")
+    user = db.relationship("User", back_populates="courses")
+    holes = db.relationship(
+        "Hole",
+        back_populates="course",
+        order_by="(Hole.hole_number.asc(), nulls_last(Hole.layout.asc()))",
+        cascade="all, delete-orphan"
+    )
+    rounds = db.relationship(
+        "Round",
+        back_populates="course",
+        order_by="(Round.date.desc())",
+        cascade="all, delete-orphan"
+    )
 
 
 class CourseSchema(Schema):
@@ -31,17 +44,23 @@ class CourseSchema(Schema):
 
 @app.route("/courses", methods=["GET"])
 def course_list():
-    courses = db.session.execute(db.select(Course).order_by(Course.favorite.desc())).scalars()
+    courses = db.session.execute(
+        db.select(Course)
+        .where(Course.user_id == current_user.id)
+        .order_by(Course.favorite.desc())
+    ).scalars()
     return CourseSchema(many=True).dump(courses)
+
 
 @app.route("/courses", methods=["POST"])
 def course_add():
     schema = CourseSchema()
     request_data = schema.load(request.json)
-    new_course = Course(**request_data)
+    new_course = Course(user_id=current_user.id, **request_data)
     db.session.add(new_course)
     db.session.commit()
     return schema.dump(new_course)
+
 
 @app.route("/courses/<int:id>", methods=["DELETE"])
 def course_delete(id):
@@ -49,6 +68,7 @@ def course_delete(id):
     db.session.delete(course)
     db.session.commit()
     return ({}, 204)
+
 
 @app.route("/courses/<int:id>", methods=["PUT"])
 def course_update(id):
