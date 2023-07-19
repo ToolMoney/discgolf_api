@@ -14,7 +14,7 @@ login_manager = LoginManager()
 login_manager.init_app(app)
 app.config.from_file("config.json", load=json.load)
 app.config["SESSION_COOKIE_SAMESITE"] = "None"
-app.config["SESSION_COOKIE_SECURE"] = True
+app.config["SESSION_COOKIE_SECURE"] = False  # TODO set to True once using HTTPS
 bcrypt = Bcrypt(app)
 
 
