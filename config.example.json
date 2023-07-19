@@ -1,1 +1,4 @@
-{"SECRET_KEY": "$$$ CHANGE THIS VALUE $$$"}
+{
+    "SECRET_KEY": "$$$ CHANGE THIS VALUE $$$",
+    "Access-Control-Allow-Origin": "http://localhost:5173"
+}

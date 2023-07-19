@@ -20,7 +20,7 @@ bcrypt = Bcrypt(app)
 
 @app.after_request
 def add_cors_headers(response):
-    response.headers["Access-Control-Allow-Origin"] = "http://localhost:5173"
+    response.headers["Access-Control-Allow-Origin"] = app.config["ACCESS_CONTROL_ALLOW_ORIGIN"]
     response.headers["Access-Control-Allow-Headers"] = "content-type"
     response.headers["Access-Control-Allow-Methods"] = "GET, PUT, DELETE, POST"
     response.headers["Access-Control-Allow-Credentials"] = "true"
