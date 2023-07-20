@@ -1,7 +1,7 @@
 from . import app, db
 from flask import request
 from marshmallow import Schema, fields, EXCLUDE
-from flask_login import current_user
+from flask_login import current_user, login_required
 
 
 class Score(db.Model):
@@ -27,6 +27,7 @@ class ScoreSchema(Schema):
 
 
 @app.route("/rounds/<int:round_id>/scores", methods=["POST"])
+@login_required
 def score_add(round_id):
     schema = ScoreSchema()
     request_data = schema.load(request.json)
@@ -37,6 +38,7 @@ def score_add(round_id):
 
 
 @app.route("/rounds/<int:round_id>/scores/<int:id>", methods=["DELETE"])
+@login_required
 def score_delete(round_id, id):
     score = db.get_or_404(Score, id)
     db.session.delete(score)
@@ -45,6 +47,7 @@ def score_delete(round_id, id):
 
 
 @app.route("/rounds/<int:round_id>/scores/<int:id>", methods=["PUT"])
+@login_required
 def score_update(round_id, id):
     schema = ScoreSchema()
     updated_score = schema.load(request.json)

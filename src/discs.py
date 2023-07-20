@@ -1,7 +1,7 @@
 from . import app, db
 from flask import request
 from marshmallow import Schema, fields, EXCLUDE
-from flask_login import current_user
+from flask_login import current_user, login_required
 
 
 class Disc(db.Model):
@@ -31,6 +31,7 @@ class DiscSchema(Schema):
 
 
 @app.route("/discs", methods=["GET"])
+@login_required
 def disc_list():
     discs = db.session.execute(
         db.select(Disc)
@@ -42,6 +43,7 @@ def disc_list():
 
 
 @app.route("/discs", methods=["POST"])
+@login_required
 def disc_add():
     schema = DiscSchema()
     request_data = schema.load(request.json)
@@ -52,6 +54,7 @@ def disc_add():
 
 
 @app.route("/discs/<int:id>", methods=["DELETE"])
+@login_required
 def disc_delete(id):
     disc = db.get_or_404(Disc, id)
     db.session.delete(disc)
@@ -60,6 +63,7 @@ def disc_delete(id):
 
 
 @app.route("/discs/<int:id>", methods=["PUT"])
+@login_required
 def disc_update(id):
     schema = DiscSchema()
     updated_disc = schema.load(request.json)

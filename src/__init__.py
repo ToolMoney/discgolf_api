@@ -7,13 +7,14 @@ import traceback
 
 db = SQLAlchemy()
 app = Flask(__name__, instance_relative_config=True)
+app.config.from_file("config.json", load=json.load)
+app.config["SESSION_COOKIE_SAMESITE"] = "None"
+app.config["SESSION_COOKIE_SECURE"] = False  # TODO set to True once using HTTPS
 db.init_app(app)
 
 login_manager = LoginManager()
 login_manager.init_app(app)
-app.config.from_file("config.json", load=json.load)
-app.config["SESSION_COOKIE_SAMESITE"] = "None"
-app.config["SESSION_COOKIE_SECURE"] = False  # TODO set to True once using HTTPS
+
 bcrypt = Bcrypt(app)
 
 

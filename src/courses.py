@@ -3,7 +3,7 @@ from flask import request
 from marshmallow import Schema, fields, EXCLUDE
 from .holes import HoleSchema
 from .rounds import RoundSchema
-from flask_login import current_user
+from flask_login import current_user, login_required
 
 
 class Course(db.Model):
@@ -43,6 +43,7 @@ class CourseSchema(Schema):
 
 
 @app.route("/courses", methods=["GET"])
+@login_required
 def course_list():
     courses = db.session.execute(
         db.select(Course)
@@ -53,6 +54,7 @@ def course_list():
 
 
 @app.route("/courses", methods=["POST"])
+@login_required
 def course_add():
     schema = CourseSchema()
     request_data = schema.load(request.json)
@@ -63,6 +65,7 @@ def course_add():
 
 
 @app.route("/courses/<int:id>", methods=["DELETE"])
+@login_required
 def course_delete(id):
     course = db.get_or_404(Course, id)
     db.session.delete(course)
@@ -71,6 +74,7 @@ def course_delete(id):
 
 
 @app.route("/courses/<int:id>", methods=["PUT"])
+@login_required
 def course_update(id):
     schema = CourseSchema()
     updated_course = schema.load(request.json)
@@ -84,6 +88,7 @@ def course_update(id):
 
 
 @app.route("/courses/<int:id>", methods=["GET"])
+@login_required
 def course_details(id):
     course = db.session.execute(db.select(Course).where(Course.id == id)).scalar()
     return CourseSchema().dump(course)

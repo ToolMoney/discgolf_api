@@ -2,7 +2,7 @@ from . import app, db
 from flask import request
 from marshmallow import Schema, fields, EXCLUDE
 from .scores import ScoreSchema
-from flask_login import current_user
+from flask_login import current_user, login_required
 
 
 class Round(db.Model):
@@ -29,6 +29,7 @@ class RoundSchema(Schema):
 
 
 @app.route("/rounds", methods=["GET"])
+@login_required
 def round_list():
     rounds = db.session.execute(
         db.select(Round)
@@ -39,6 +40,7 @@ def round_list():
 
 
 @app.route("/rounds", methods=["POST"])
+@login_required
 def round_add():
     schema = RoundSchema()
     request_data = schema.load(request.json)
@@ -49,6 +51,7 @@ def round_add():
 
 
 @app.route("/rounds/<int:id>", methods=["DELETE"])
+@login_required
 def round_delete(id):
     round = db.get_or_404(Round, id)
     db.session.delete(round)
@@ -57,6 +60,7 @@ def round_delete(id):
 
 
 @app.route("/rounds/<int:id>", methods=["PUT"])
+@login_required
 def round_update(id):
     schema = RoundSchema()
     updated_round = schema.load(request.json)
@@ -70,6 +74,7 @@ def round_update(id):
 
 
 @app.route("/rounds/<int:id>", methods=["GET"])
+@login_required
 def round_details(id):
     round = db.session.execute(db.select(Round).where(Round.id == id)).scalar()
     return RoundSchema().dump(round)

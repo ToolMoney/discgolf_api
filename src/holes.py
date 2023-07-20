@@ -1,7 +1,7 @@
 from . import app, db
 from flask import request
 from marshmallow import Schema, fields, EXCLUDE
-from flask_login import current_user
+from flask_login import current_user, login_required
 
 
 class Hole(db.Model):
@@ -35,6 +35,7 @@ class HoleSchema(Schema):
 
 
 @app.route("/courses/<int:course_id>", methods=["POST"])
+@login_required
 def hole_add(course_id):
     schema = HoleSchema()
     request_data = schema.load({"course_id": course_id, **request.json})
@@ -45,6 +46,7 @@ def hole_add(course_id):
 
 
 @app.route("/courses/<int:course_id>/<int:id>", methods=["DELETE"])
+@login_required
 def hole_delete(course_id, id):
     hole = db.get_or_404(Hole, id)
     db.session.delete(hole)
@@ -53,6 +55,7 @@ def hole_delete(course_id, id):
 
 
 @app.route("/courses/<int:course_id>/<int:id>", methods=["PUT"])
+@login_required
 def hole_update(course_id, id):
     schema = HoleSchema()
     updated_hole = schema.load(request.json)
