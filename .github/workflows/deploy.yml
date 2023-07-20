@@ -28,39 +28,12 @@ jobs:
         with:
           push: true
           tags: public.ecr.aws/f9m9y0y6/disc4days:latest
-      
 
-
-
-
-      # - name: Configure AWS credentials
-      #   uses: aws-actions/configure-aws-credentials@0e613a0980cbf65ed5b322eb7a1e075d28913a83
-      #   with:
-      #     aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-      #     aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-      #     aws-region: ${{ env.AWS_REGION }}
-
-
-
-
-
-
-      # - name: Checkout
-      #   uses: actions/checkout@v3
-      # - name: Setup node
-      #   uses: actions/setup-node@v3
-      #   with:
-      #     node-version: 18.16.x
-      #     cache: npm
-      # - name: Install
-      #   run: npm ci
-      # - name: Build
-      #   run: npm run build
-      # - name: Configure AWS credentials
-      #   uses: aws-actions/configure-aws-credentials@0e613a0980cbf65ed5b322eb7a1e075d28913a83
-      #   with:
-      #     aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-      #     aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-      #     aws-region: ${{ env.AWS_REGION }}
-      # - name: Sync to S3
-      #   run: aws s3 sync dist s3://disc4days.stanleyhicks.me
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@0e613a0980cbf65ed5b322eb7a1e075d28913a83
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+      - name: Deploy Latest Image from ECR to ECS
+        run: aws ecs update-service --cluster disc4days --service disc4days --force-new-deployment
