@@ -7,7 +7,6 @@ import traceback
 
 db = SQLAlchemy()
 app = Flask(__name__, instance_relative_config=True)
-app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///project.db"
 db.init_app(app)
 
 login_manager = LoginManager()

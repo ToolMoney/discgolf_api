@@ -7,3 +7,5 @@ flask-login
 flask-bcrypt
 flake8
 gunicorn
+psycopg2-binary
+sqlalchemy-rdsiam

@@ -1,4 +1,5 @@
 {
     "SECRET_KEY": "$$$ CHANGE THIS VALUE $$$",
-    "Access-Control-Allow-Origin": "http://localhost:5173"
+    "Access-Control-Allow-Origin": "http://localhost:5173",
+    "SQLALCHEMY_DATABASE_URI": "sqlite:///"
 }
