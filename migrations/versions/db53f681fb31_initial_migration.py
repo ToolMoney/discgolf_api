@@ -1,7 +1,7 @@
 """initial migration
 
 Revision ID: db53f681fb31
-Revises: 
+Revises:
 Create Date: 2023-07-05 13:03:00.567527
 
 """

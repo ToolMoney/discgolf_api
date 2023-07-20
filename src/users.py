@@ -6,7 +6,7 @@ from flask_login import UserMixin, login_user, current_user
 
 class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String, nullable=False)
+    name = db.Column(db.String, nullable=False, unique=True)
     pass_hash = db.Column(db.String, nullable=False)
     email = db.Column(db.String, nullable=False)
 
