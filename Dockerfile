@@ -7,7 +7,7 @@ RUN pip install -r requirements.txt
 RUN mkdir instance
 RUN cat > instance/config.json <<EOF
     {
-        "ACCESS_CONTROL_ALLOW_ORIGIN": "http://disc4days.stanleyhicks.me",
+        "ACCESS_CONTROL_ALLOW_ORIGIN": "https://disc4days.stanleyhicks.me",
         "SQLALCHEMY_DATABASE_URI": "postgresql+psycopg2rdsiam://disc4days_api@database-1.cp8bsjrjvguq.us-west-2.rds.amazonaws.com:5432/disc4days?aws_region_name=us-west-2"
     }
 EOF
