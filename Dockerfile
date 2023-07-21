@@ -7,7 +7,6 @@ RUN pip install -r requirements.txt
 RUN mkdir instance
 RUN cat > instance/config.json <<EOF
     {
-        "SECRET_KEY": "$(openssl rand -base64 32)",
         "ACCESS_CONTROL_ALLOW_ORIGIN": "http://disc4days.stanleyhicks.me",
         "SQLALCHEMY_DATABASE_URI": "postgresql+psycopg2rdsiam://disc4days_api@database-1.cp8bsjrjvguq.us-west-2.rds.amazonaws.com:5432/disc4days?aws_region_name=us-west-2"
     }

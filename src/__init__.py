@@ -8,6 +8,7 @@ import traceback
 db = SQLAlchemy()
 app = Flask(__name__, instance_relative_config=True)
 app.config.from_file("config.json", load=json.load)
+app.config.from_prefixed_env()
 app.config["SESSION_COOKIE_SAMESITE"] = "None"
 app.config["SESSION_COOKIE_SECURE"] = False  # TODO set to True once using HTTPS
 db.init_app(app)
