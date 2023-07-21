@@ -13,5 +13,6 @@ RUN cat > instance/config.json <<EOF
     }
 EOF
 ENTRYPOINT [ "alembic", "upgrade", "head" ]
-CMD [ "gunicorn", "-w", "4", "src:app", "--bind=0.0.0.0:5000" ]
+CMD [ ";", "gunicorn", "-w", "4", "src:app", "--bind=0.0.0.0:5000" ]
+
 EXPOSE 5000
