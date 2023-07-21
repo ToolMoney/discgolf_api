@@ -10,7 +10,7 @@ app = Flask(__name__, instance_relative_config=True)
 app.config.from_file("config.json", load=json.load)
 app.config.from_prefixed_env()
 app.config["SESSION_COOKIE_SAMESITE"] = "None"
-app.config["SESSION_COOKIE_SECURE"] = False  # TODO set to True once using HTTPS
+app.config["SESSION_COOKIE_SECURE"] = True
 db.init_app(app)
 
 login_manager = LoginManager()
@@ -54,4 +54,4 @@ def handle_exception(exception):
     }), 500
 
 
-from . import discs, courses, holes, rounds, scores, users
+from . import discs, courses, holes, rounds, scores, users  # noqa
