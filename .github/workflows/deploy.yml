@@ -36,4 +36,4 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ env.AWS_REGION }}
       - name: Deploy Latest Image from ECR to ECS
-        run: aws ecs update-service --cluster disc4days --service disc4days --force-new-deployment
+        run: aws ecs update-service --cluster disc4days --service disc4days --force-new-deployment --task-definition disc4days2
